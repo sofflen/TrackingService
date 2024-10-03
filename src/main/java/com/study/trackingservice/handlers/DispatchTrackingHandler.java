@@ -12,11 +12,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class DispatchTrackingHandler {
 
+    public static final String DISPATCH_TRACKING_TOPIC = "dispatch.tracking";
+
     private final TrackingService trackingService;
 
     @KafkaListener(
             id = "dispatchTrackingConsumerClient",
-            topics = "dispatch.tracking",
+            topics = DISPATCH_TRACKING_TOPIC,
             groupId = "tracking.dispatch.tracking.consumer",
             containerFactory = "kafkaListenerContainerFactory"
     )
