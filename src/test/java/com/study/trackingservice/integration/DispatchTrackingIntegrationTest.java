@@ -52,10 +52,20 @@ class DispatchTrackingIntegrationTest {
     }
 
     @Test
-    void testTrackingStatusUpdate() throws Exception {
+    void testDispatchPreparingUpdate() throws Exception {
         var dispatchPreparingEvent = EventUtils.randomDispatchPreparingEvent();
 
         kafkaTemplate.send(DISPATCH_TRACKING_TOPIC, dispatchPreparingEvent).get();
+
+        await().atMost(3, TimeUnit.SECONDS).pollDelay(100, TimeUnit.MILLISECONDS)
+                .until(testListener.trackingUpdateCounter::get, equalTo(1));
+    }
+
+    @Test
+    void testDispatchCompletedUpdate() throws Exception {
+        var dispatchCompletedEvent = EventUtils.randomDispatchCompletedEvent();
+
+        kafkaTemplate.send(DISPATCH_TRACKING_TOPIC, dispatchCompletedEvent).get();
 
         await().atMost(3, TimeUnit.SECONDS).pollDelay(100, TimeUnit.MILLISECONDS)
                 .until(testListener.trackingUpdateCounter::get, equalTo(1));

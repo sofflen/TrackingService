@@ -11,6 +11,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DispatchPreparingEvent implements TrackingEvent {
+public class DispatchCompletedEvent implements TrackingEvent {
     private UUID orderId;
+    private String date;
 }

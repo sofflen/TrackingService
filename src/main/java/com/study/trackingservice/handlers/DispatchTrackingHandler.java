@@ -1,5 +1,6 @@
 package com.study.trackingservice.handlers;
 
+import com.study.dispatchservice.messages.DispatchCompletedEvent;
 import com.study.dispatchservice.messages.DispatchPreparingEvent;
 import com.study.trackingservice.services.TrackingService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,21 @@ public class DispatchTrackingHandler {
         try {
             trackingService.process(payload);
         } catch (Exception e) {
-            log.error("DispatchTrackingHandler Processing failure: ", e);
+            log.error("DispatchPreparingEvent Processing failure: ", e);
+            if (e.getCause() instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    @KafkaHandler
+    public void listen(DispatchCompletedEvent payload) {
+        log.info("DispatchTrackingHandler received payload: {}", payload);
+
+        try {
+            trackingService.process(payload);
+        } catch (Exception e) {
+            log.error("DispatchCompletedEvent Processing failure: ", e);
             if (e.getCause() instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
             }

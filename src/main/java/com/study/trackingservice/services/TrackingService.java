@@ -1,6 +1,8 @@
 package com.study.trackingservice.services;
 
+import com.study.dispatchservice.messages.DispatchCompletedEvent;
 import com.study.dispatchservice.messages.DispatchPreparingEvent;
+import com.study.dispatchservice.messages.TrackingEvent;
 import com.study.dispatchservice.messages.TrackingStatusUpdatedEvent;
 import com.study.trackingservice.statuses.TrackingStatus;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +19,15 @@ public class TrackingService {
 
     private final KafkaTemplate<String, Object> kafkaProducer;
 
-    public void process(DispatchPreparingEvent dispatchPreparingEvent) throws Exception{
-        log.info("Processing dispatch preparing event: {}", dispatchPreparingEvent);
+    public void process(TrackingEvent trackingEvent) throws Exception {
+        log.info("Processing tracking event: {}", trackingEvent);
+        var trackingStatusEvent = TrackingStatusUpdatedEvent.builder().orderId(trackingEvent.getOrderId()).build();
 
-        var trackingEvent = new TrackingStatusUpdatedEvent(dispatchPreparingEvent.getOrderId(), TrackingStatus.PREPARING);
+        switch (trackingEvent) {
+            case DispatchPreparingEvent ignored -> trackingStatusEvent.setStatus(TrackingStatus.PREPARING);
+            case DispatchCompletedEvent ignored -> trackingStatusEvent.setStatus(TrackingStatus.DISPATCHED);
+            default -> throw new IllegalStateException("Unexpected value: " + trackingEvent);
+        }
 
         kafkaProducer.send(TRACKING_STATUS_TOPIC, trackingEvent).get();
         log.info("Tracking status updated: {}", trackingEvent);

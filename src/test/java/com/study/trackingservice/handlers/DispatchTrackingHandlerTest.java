@@ -21,7 +21,7 @@ class DispatchTrackingHandlerTest {
     }
 
     @Test
-    void listen_success() throws Exception {
+    void listen_DispatchPreparingEventSuccess() throws Exception {
         var testEvent = EventUtils.randomDispatchPreparingEvent();
 
         dispatchTrackingHandler.listen(testEvent);
@@ -30,8 +30,27 @@ class DispatchTrackingHandlerTest {
     }
 
     @Test
-    void listen_catchesException() throws Exception {
+    void listen_DispatchCompletedEventSuccess() throws Exception {
+        var testEvent = EventUtils.randomDispatchCompletedEvent();
+
+        dispatchTrackingHandler.listen(testEvent);
+
+        verify(trackingServiceMock).process(testEvent);
+    }
+
+    @Test
+    void listen_DispatchPreparingEventCatchesException() throws Exception {
         var testEvent = EventUtils.randomDispatchPreparingEvent();
+        doThrow(new RuntimeException()).when(trackingServiceMock).process(testEvent);
+
+        dispatchTrackingHandler.listen(testEvent);
+
+        verify(trackingServiceMock).process(testEvent);
+    }
+
+    @Test
+    void listen_DispatchCompletedEventCatchesException() throws Exception {
+        var testEvent = EventUtils.randomDispatchCompletedEvent();
         doThrow(new RuntimeException()).when(trackingServiceMock).process(testEvent);
 
         dispatchTrackingHandler.listen(testEvent);
