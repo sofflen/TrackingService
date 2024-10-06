@@ -1,6 +1,5 @@
 package com.study.trackingservice.config;
 
-import com.study.dispatchservice.messages.DispatchPreparingEvent;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -21,7 +20,9 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import java.util.HashMap;
 
 @Configuration
-public class DispatchConfiguration {
+public class TrackingConfiguration {
+
+    public static final String TRUSTED_PACKAGES = "com.study.dispatchservice.messages";
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory
@@ -40,8 +41,7 @@ public class DispatchConfiguration {
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         config.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
-        config.put(JsonDeserializer.VALUE_DEFAULT_TYPE, DispatchPreparingEvent.class.getCanonicalName());
-        config.put(JsonDeserializer.TRUSTED_PACKAGES, "com.study.dispatchservice.messages");
+        config.put(JsonDeserializer.TRUSTED_PACKAGES, TRUSTED_PACKAGES);
 
         return new DefaultKafkaConsumerFactory<>(config);
     }
